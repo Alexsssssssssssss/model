@@ -1,0 +1,15 @@
+# 天凤个室 2456：三个自训麻将 AI
+
+[下载 Windows 接入包](https://github.com/Alexsssssssssssss/model/releases/download/tenhou-room-2456-v1/tenhou-room-2456.zip)
+
+避四、平衡、争一模型合计完成 50,000 个训练半庄。接入包使用独立种子验证后选定的较早检查点，不直接使用最终训练权重。
+
+解压后，安装 64 位 Python 3.12，双击 `start-tenhou-2456.cmd`。按提示在自己的电脑输入三个 AI 账号 ID，然后本人进入 https://tenhou.net/3/?L2456 ，预约四人半庄、食断、赤牌。完整说明在压缩包的 README.md。
+
+包内不含账号凭据或原始牌谱。账号只保存本机，三个 AI 每次各打一场半庄。不要把本人账号作为 AI 账号，也不要同时在其他客户端登录这些 AI 账号。
+
+已通过模型加载、511 次公开牌谱合法决策、私房 JOIN 限制和 WebSocket 握手验证；真实账号登录及完整在线对战尚未验证。重连后的 REINIT 状态暂不支持。模型强度的评估仅针对固定监督模型基准，不能换算为天凤段位。
+
+天凤协议网关来自 [tomohxx/mjai-gateway](https://github.com/tomohxx/mjai-gateway)，MIT 许可证随包附带；没有使用其策略模型或训练牌谱。
+
+SHA-256：`3cc4eb19602eb6e90b32520320d498c19a3eb258e3c40225e4e17599cba2e070`
