@@ -12,4 +12,4 @@
 
 天凤协议网关来自 [tomohxx/mjai-gateway](https://github.com/tomohxx/mjai-gateway)，MIT 许可证随包附带；没有使用其策略模型或训练牌谱。
 
-SHA-256：`3cc4eb19602eb6e90b32520320d498c19a3eb258e3c40225e4e17599cba2e070`
+SHA-256：`f7493a3d4aa674b61b1db7c350ed25c420c1578baa9d5cd8dad9d28e00720f2b`
