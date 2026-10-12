@@ -14,7 +14,6 @@
 
 SHA-256：`f7493a3d4aa674b61b1db7c350ed25c420c1578baa9d5cd8dad9d28e00720f2b`
 
-
 ## 网页对战控制台
 
 [下载 AI 控制台（ZIP）](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/ai-dispatch-console.zip) · [使用说明](downloads/AI-CONSOLE-GUIDE.md)
