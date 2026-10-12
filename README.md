@@ -1,6 +1,6 @@
 # 天凤个室 2456：三个自训麻将 AI
 
-[下载 Windows 接入包](https://github.com/Alexsssssssssssss/model/releases/download/tenhou-room-2456-v1/tenhou-room-2456.zip)
+[下载 Windows 接入包](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/tenhou-room-2456.zip)
 
 避四、平衡、争一模型合计完成 50,000 个训练半庄。接入包使用独立种子验证后选定的较早检查点，不直接使用最终训练权重。
 
