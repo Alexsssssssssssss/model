@@ -1,3 +1,11 @@
+<!-- V4-CONSOLE-START -->
+## 当前派遣网站：20261013.1（修复重训 v4）
+
+[下载完整网站与四个模型](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/ai-dispatch-console-v4.zip) · [使用说明](downloads/AI-CONSOLE-V4-GUIDE.md) · [模型对照图片](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/model-comparison-100k.png)
+
+解压后运行 start-ai-console.cmd，浏览器中输入任意天凤个室号（1000–9999），选择 1～3 位 AI 和本机账号即可派遣。网站在自己电脑上运行。此包包含修复重训后的监督基准及三个 10 万半庄强化学习优选模型，旧 v1/v2 不再作为选项；账号、原始牌谱和训练日志不在包内。最终独立评估未证明显著提升牌力，建议先测试监督基准。雀魂仍为实验接入；实服登录和断线稳定性尚未重新验证。下方旧版链接仅保留历史参考。
+<!-- V4-CONSOLE-END -->
+
 # 天凤个室 2456：三个自训麻将 AI
 
 [下载 Windows 接入包](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/tenhou-room-2456.zip)
