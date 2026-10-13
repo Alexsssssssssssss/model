@@ -32,4 +32,4 @@ v5是基于监督基准的真人牌谱微调，个人有效损失10%、高手90%
 
 天凤网关来自[tomohxx/mjai-gateway](https://github.com/tomohxx/mjai-gateway)，MIT许可证随包；未使用其策略权重或训练牌谱。
 
-下载包SHA-256：`33b0df52a1f6218832245d2af04a95743412c69b813d6015e84fae63b2e0ed2c`。
+下载包SHA-256：`8eed67ae9dd407535b48008797aa519fbad66140b00141832b219e0086369a0a`。
