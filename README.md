@@ -1,6 +1,6 @@
 # 麻将AI邀请派遣网站
 
-当前版本 **20261014.3**。仅保留监督基准v4和监督微调攻防测试版v5。旧争一、平衡、避四强化学习版本已从菜单和下载包移除，历史记录仅供审计。
+当前版本 **20261014.4**。仅保留监督基准v4和监督微调攻防测试版v5。旧争一、平衡、避四强化学习版本已从菜单和下载包移除，历史记录仅供审计。
 
 [下载网站与两个模型](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/tenhou-room-2456.zip) · [网站启动与部署](downloads/SITE-DEPLOY.md) · [本机控制台说明](downloads/AI-CONSOLE-GUIDE.md)
 
@@ -32,4 +32,4 @@ v5是基于监督基准的真人牌谱微调，个人有效损失10%、高手90%
 
 天凤网关来自[tomohxx/mjai-gateway](https://github.com/tomohxx/mjai-gateway)，MIT许可证随包；未使用其策略权重或训练牌谱。
 
-下载包SHA-256：`f3284f5470ac8629daac7f379bf9b632af401d2afe67bcfc987ee48873d23440`。
+下载包SHA-256：`2c5af4e6c8531cfdd20be87e016adf0a39041a9796b2cd97fbfe54dfec38f611`。
