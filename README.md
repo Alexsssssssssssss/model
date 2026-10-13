@@ -39,6 +39,6 @@
 
 天凤协议网关来自 [tomohxx/mjai-gateway](https://github.com/tomohxx/mjai-gateway)，MIT 许可证随包附带；未使用其策略模型或训练牌谱。
 
-下载包 SHA-256：`027215b2ac13285b217d199d27ff2fa78b8d498af7ee01265974e9bafd5fc469`
+下载包 SHA-256：`feadc6eaa38cf23c56478fa25a4df37c98a3d90fdaff4d313913625dd0f0c90c`
 
 所有旧 ZIP 下载地址均已覆盖为同一新版：`tenhou-room-2456.zip`、`ai-dispatch-console.zip`、`ai-dispatch-console-fixed.zip`；另保留 `ai-dispatch-console-v4.zip` 版本地址。
