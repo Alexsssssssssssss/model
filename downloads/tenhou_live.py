@@ -110,6 +110,8 @@ class PrivateRoomClient:
         self.ended=False;self.packet={};self.log=None;self.status_path=None
         self.events=[];self.result=None;self.first_oya=None;self.status_callback=status_callback;self.output=output;self.wait_timeout=wait_timeout;self.started=False
         self.network_log=None;self.last_sent=None;self.last_received=None;self.phase='connecting'
+        self.last_sent_at=None;self.last_received_at=None;self.last_heartbeat_at=None
+        self.heartbeat_count=0;self.heartbeat_error=None
 
     async def send_event(self,event):
         event=dict(event)
@@ -160,8 +162,8 @@ class PrivateRoomClient:
         allowed=('tag','type','p','hai','hai0','hai1','who','fromWho','step','t','log','oya','seed','ten','sc','owari')
         packet={k:message[k] for k in allowed if k in message}
         if message.get('tag')=='HELO':packet={'tag':'HELO'}
-        if direction=='sent':self.last_sent=packet
-        else:self.last_received=packet
+        if direction=='sent':self.last_sent=packet;self.last_sent_at=time.time()
+        else:self.last_received=packet;self.last_received_at=time.time()
         if self.network_log:
             self.network_log.write(json.dumps(dict(time=time.time(),direction=direction,packet=packet),ensure_ascii=False)+'\n');self.network_log.flush()
 
@@ -181,8 +183,17 @@ class PrivateRoomClient:
                 async with connect('wss://b-ww.mjv.jp',origin='https://tenhou.net',open_timeout=20,ping_interval=None) as ws:
                     await self.send_packet(ws,{'tag':'HELO','name':self.account,'sx':'M'})
                     async def keepalive():
-                        while not self.ended:
-                            await ws.send('<Z/>');await asyncio.sleep(10)
+                        try:
+                            while not self.ended:
+                                await ws.send('<Z/>')
+                                self.last_heartbeat_at=time.time();self.heartbeat_count+=1
+                                if self.network_log:
+                                    self.network_log.write(json.dumps(dict(time=self.last_heartbeat_at,direction='sent',packet={'tag':'Z'}))+'\n');self.network_log.flush()
+                                await asyncio.sleep(10)
+                        except asyncio.CancelledError:raise
+                        except Exception as exc:
+                            self.heartbeat_error=dict(type=type(exc).__name__,error=str(exc),time=time.time())
+                            await ws.close()
                     heartbeat=asyncio.create_task(keepalive());connected_at=time.monotonic();game_started_at=None
                     try:
                         while not self.ended:
@@ -214,6 +225,8 @@ class PrivateRoomClient:
             return self.result
         except BaseException as exc:
             diagnosis=dict(error_type=type(exc).__name__,error=str(exc),phase=self.phase,
+                           time=time.time(),last_sent_at=self.last_sent_at,last_received_at=self.last_received_at,
+                           last_heartbeat_at=self.last_heartbeat_at,heartbeat_count=self.heartbeat_count,heartbeat_error=self.heartbeat_error,
                            last_sent=self.last_sent,last_received=self.last_received,
                            checkpoint_sha256=self.policy.model.source_sha256,
                            selection_mode='sampled' if self.policy.training else 'argmax',
@@ -241,10 +254,14 @@ def configurations(path):
         if not checkpoint.is_file():raise ValueError('A local model checkpoint is missing')
         yield PrivateRoomClient(row['id'],row['profile'],checkpoint,room=room)
 
-async def run_all(clients):
+async def run_all(clients,independent=False):
     # One requested half-game each; no automatic matchmaking after it ends.
     jobs=[asyncio.create_task(c.run()) for c in clients]
-    try:await asyncio.gather(*jobs)
+    try:
+        results=await asyncio.gather(*jobs,return_exceptions=independent)
+        if independent:
+            errors=[result for result in results if isinstance(result,BaseException)]
+            if errors:raise errors[0]
     finally:
         for j in jobs:
             if not j.done():j.cancel()
