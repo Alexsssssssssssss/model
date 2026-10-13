@@ -1,37 +1,44 @@
-<!-- V4-CONSOLE-START -->
-## 当前派遣网站：20261013.1（修复重训 v4）
+# 麻将 AI 派遣网站
 
-[下载完整网站与四个模型](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/ai-dispatch-console-v4.zip) · [使用说明](downloads/AI-CONSOLE-V4-GUIDE.md) · [模型对照图片](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/model-comparison-100k.png)
+当前版本：**20261013.1 · 修复重训 v4**。旧的 2456 下载包已覆盖为新版，**房间号可以自行输入，不再固定为 2456**。
 
-解压后运行 start-ai-console.cmd，浏览器中输入任意天凤个室号（1000–9999），选择 1～3 位 AI 和本机账号即可派遣。网站在自己电脑上运行。此包包含修复重训后的监督基准及三个 10 万半庄强化学习优选模型，旧 v1/v2 不再作为选项；账号、原始牌谱和训练日志不在包内。最终独立评估未证明显著提升牌力，建议先测试监督基准。雀魂仍为实验接入；实服登录和断线稳定性尚未重新验证。下方旧版链接仅保留历史参考。
-<!-- V4-CONSOLE-END -->
+[下载 Windows 网站与四个模型](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/tenhou-room-2456.zip) · [完整使用说明](downloads/AI-CONSOLE-V4-GUIDE.md) · [查看 / 保存模型对照图](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/model-comparison-100k.png)
 
-# 天凤个室 2456：三个自训麻将 AI
+## 启动并与 AI 打一局
 
-[下载 Windows 接入包](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/tenhou-room-2456.zip)
+1. 安装 64 位 Python 3.12，解压下载包。
+2. 双击 `start-ai-console.cmd`。首次安装 CPU 依赖后自动打开浏览器；保留启动窗口。
+3. 在「本机账号」添加每位 AI 使用的独立天凤账号，填写完整登录 ID，不是昵称。
+4. 在「派遣对战」选择天凤，输入任意 **1000–9999** 个室号，选择 **1～3 位 AI** 的模型和账号，再点击派遣。
+5. 本人进入相同个室，凑齐四位玩家，预约四人赤牌半庄。
 
-避四、平衡、争一模型合计完成 50,000 个训练半庄。接入包使用独立种子验证后选定的较早检查点，不直接使用最终训练权重。
+网页运行在自己的电脑上；账号只保存在本机。无需在聊天或仓库里提供账号密码。网站的「任务与统计」可查看状态、牌谱链接，下载统计 CSV 和诊断记录；「模型对照」可下载完整 PNG。
 
-解压后，安装 64 位 Python 3.12，双击 `start-tenhou-2456.cmd`。按提示在自己的电脑输入三个 AI 账号 ID，然后本人进入 https://tenhou.net/3/?L2456 ，预约四人半庄、食断、赤牌。完整说明在压缩包的 README.md。
+## 模型与实际评估
 
-包内不含账号凭据或原始牌谱。账号只保存本机，三个 AI 每次各打一场半庄。不要把本人账号作为 AI 账号，也不要同时在其他客户端登录这些 AI 账号。
+提供四个模型：修复重训后的监督基准、争一、平衡、避四。旧 v1/v2 已移出模型列表；混沌恶已排除。监督训练的个人有效损失占比 10%，高手 90%。三个强化学习风格合计完成 **100,000 半庄**，使用训练期间预先选出的评估优选检查点。
 
-已通过模型加载、511 次公开牌谱合法决策、私房 JOIN 限制和 WebSocket 握手验证；真实账号登录及完整在线对战尚未验证。重连后的 REINIT 状态暂不支持。模型强度的评估仅针对固定监督模型基准，不能换算为天凤段位。
+最终配对评估共 512 个独立半庄，各项使用相同 128 组牌山、轮换座位、面对三个冻结监督基准；未使用最终评估挑选模型。
 
-天凤协议网关来自 [tomohxx/mjai-gateway](https://github.com/tomohxx/mjai-gateway)，MIT 许可证随包附带；没有使用其策略模型或训练牌谱。
+| 模型 | 独立评估半庄数 | 平均顺位 |
+|---|---:|---:|
+| 监督基准 v4 | 128 | 2.4063 |
+| 争一型 | 128 | 2.5000 |
+| 平衡型 | 128 | 2.4297 |
+| 避四型 | 128 | 2.5000 |
 
-SHA-256：`f7493a3d4aa674b61b1db7c350ed25c420c1578baa9d5cd8dad9d28e00720f2b`
+三个顺位比较的约 95% 区间均包含零，**未证明显著提升牌力**。建议先试监督基准，再比较三个风格；不能据此换算天凤段位。
 
-## 网页对战控制台
+## 更新、账号与限制
 
-[下载 AI 控制台（ZIP）](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/ai-dispatch-console.zip) · [使用说明](downloads/AI-CONSOLE-GUIDE.md)
+先关闭旧控制台，再解压新版；保留 `.venv`、`dispatch-accounts.local.json`、`runs/dispatch`。新版入口是 `start-ai-console.cmd`，不再使用旧的 `start-tenhou-2456.cmd`。也可以单独解压新版，只复制自己的账号配置。
 
-解压后双击 `start-ai-console.cmd`，需要 Python 3.12。账号在本机网页中填写。可选天凤个室号、模型和账号，派遣 1–3 个 AI 或使用四个账号进行内战与分批强化学习，保存统计 CSV。四账号连续在线循环尚未实际验证。
+包内不含账号、原始牌谱或私密对战日志。账号配置不要上传。邀请模式使用确定性最高概率动作。四 AI 内战需要四个独立账号；真人测试不用于训练。
 
-雀魂提供尚未真实账号验证的实验邀请接入；宝牌 / 攻防 v2 模型待实战强度验证。安装包不包含账号、密码或原始训练牌谱。旧2456工具仍保留。
+天凤实服断线根因尚未确认，不能保证长时间连接稳定。雀魂仍是国服账号密码友人房的实验接入，此前登录错误 151 与真实完整对局尚未验证解决。
 
-## 20261012.2 控制台修复包
+天凤协议网关来自 [tomohxx/mjai-gateway](https://github.com/tomohxx/mjai-gateway)，MIT 许可证随包附带；未使用其策略模型或训练牌谱。
 
-[下载修复版](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/ai-dispatch-console-fixed.zip)
+下载包 SHA-256：`dca3fd2c350a592527fee98c7c00b6fa35ed22ebe1fb937c856200bd4b158d50`
 
-v2 改为真正完成专家修订训练的检查点；可下载未完成对局诊断记录；新强化学习温度0.15，使用用户指定顺位奖励。覆盖到原工具目录并保留账号配置、虚拟环境和历史任务。天凤断线根因仍需诊断记录验证，未宣称实服断线已经修复。新增2万把专家谱的采集、重训、评估另行进行。
+所有旧 ZIP 下载地址均已覆盖为同一新版：`tenhou-room-2456.zip`、`ai-dispatch-console.zip`、`ai-dispatch-console-fixed.zip`；另保留 `ai-dispatch-console-v4.zip` 版本地址。
