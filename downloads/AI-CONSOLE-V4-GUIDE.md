@@ -1,4 +1,4 @@
-# 麻将AI控制台 · 20261014.2
+# 麻将AI控制台 · 20261014.3
 
 仅保留两个模型：监督基准v4（默认），监督微调·攻防测试版v5（可选）。旧争一、平衡、避四强化学习版本已从菜单与下载包移除，历史评估留作审计，不再用于部署。
 
@@ -30,10 +30,12 @@ v5从监督基准继续学习真人原始牌谱，个人有效损失10%、高手
 
 雀魂登录请求已补资源版本、地区及登录类型；游戏鉴权采用官方device字段，副露/荣和改走inputChiPengGang，切牌/自摸/暗杠等走inputOperation。版本查询、网关WSS连通性、protobuf往返和模拟入房/决策流程已检查；尚未验证真实账号。发生错误由管理员下载任务诊断，其中不保存密码、access_token或connect_token。151表示版本或平台握手不被接受，不表示账号密码错误。
 
-## 20261014.2：雀魂151修复
+## 20261014.3：雀魂151修复
 
 当前官方客户端为Unity/WebGL，旧`game.ResourceVersion`和`GameMgr`控制台命令不适用。旧`version.json`的0.11.252.w不能用于Unity登录。工具现从官方Unity资源索引解析资源版本（验证时0.16.283）和首页包版本（4.0.47），使用`WebGL_2022-资源版本`；正确解压资源索引后取文件名，不从压缩字节中猜哈希。线路握手在登录和游戏鉴权之前发送平台字段（protobuf第6字段）Web。
 
 服务器已实测：不存在的合成账号由151变为1002（账号不存在）。这验证握手修复，不等于真实账号登录或完整对战已通过。更新后仍需在本机验证。关闭旧进程，覆盖后运行启动脚本，脚本会安装新增的UnityPy依赖；仅刷新网页不会更新后端。手机号密码登录时需在账号配置选择对应登录方式。
 
 解析Unity资源使用[UnityPy](https://github.com/K0lb3/UnityPy)（MIT）；协议核对参考[majsoul-autopilot登录实现](https://github.com/happy-shine/majsoul-autopilot/blob/81365068a4560383329d6b869f19060706fbb1b5/crates/protocol/src/login.rs)和[MajsoulPaipuConvert握手说明](https://github.com/jeff39389327/MajsoulPaipuConvert/blob/4387a3e66cc4e5792cb1df8244d6bf11b95ce718/ms_patch.py)。包内不含官方游戏资源、账号或密码。
+
+20261014.3修正两个Windows启动脚本漏装UnityPy的问题。已有虚拟环境也会检查并补装UnityPy==1.25.4，无需重新安装模型或Torch。若已下载上一包，可在程序目录执行 `.\.venv\Scripts\python.exe -m pip install UnityPy==1.25.4` 后重启。
