@@ -1,8 +1,8 @@
 # 麻将 AI 派遣网站
 
-当前版本：**20261013.1 · 修复重训 v4**。旧的 2456 下载包已覆盖为新版，**房间号可以自行输入，不再固定为 2456**。
+当前版本：**20261013.2 · 修复重训 v4**。旧的 2456 下载包已覆盖为新版，**房间号可以自行输入，不再固定为 2456**。
 
-[下载 Windows 网站与四个模型](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/tenhou-room-2456.zip) · [完整使用说明](downloads/AI-CONSOLE-V4-GUIDE.md) · [查看 / 保存模型对照图](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/model-comparison-100k.png)
+[下载 Windows 网站与五个模型](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/tenhou-room-2456.zip) · [完整使用说明](downloads/AI-CONSOLE-V4-GUIDE.md) · [查看 / 保存模型对照图](https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/model-comparison-100k.png)
 
 ## 启动并与 AI 打一局
 
@@ -20,7 +20,7 @@
 
 ## 模型与实际评估
 
-提供四个模型：修复重训后的监督基准、争一、平衡、避四。旧 v1/v2 已移出模型列表；混沌恶已排除。监督训练的个人有效损失占比 10%，高手 90%。三个强化学习风格合计完成 **100,000 半庄**，使用训练期间预先选出的评估优选检查点。
+提供五个模型：新增可选「监督微调 · 攻防测试版 v5」，原基准仍为默认。固定2000半庄评估新2.463、旧2.537，改善95%区间[-0.010,0.158]，未证明显著提升。其余为修复重训后的监督基准、争一、平衡、避四。旧 v1/v2 已移出模型列表；混沌恶已排除。监督训练的个人有效损失占比 10%，高手 90%。三个强化学习风格合计完成 **100,000 半庄**，使用训练期间预先选出的评估优选检查点。
 
 最终配对评估共 512 个独立半庄，各项使用相同 128 组牌山、轮换座位、面对三个冻结监督基准；未使用最终评估挑选模型。
 
@@ -43,6 +43,6 @@
 
 天凤协议网关来自 [tomohxx/mjai-gateway](https://github.com/tomohxx/mjai-gateway)，MIT 许可证随包附带；未使用其策略模型或训练牌谱。
 
-下载包 SHA-256：`f31172665e5a37ea1ee7b81575b65cedb4e8028dc5af7d12347ac577787e3ba7`
+下载包 SHA-256：`ccbe0b6790fb1a2022ebbd1b5159badafe9a3a194b655dd34230c04043a5c32d`
 
 所有旧 ZIP 下载地址均已覆盖为同一新版：`tenhou-room-2456.zip`、`ai-dispatch-console.zip`、`ai-dispatch-console-fixed.zip`；另保留 `ai-dispatch-console-v4.zip` 版本地址。
