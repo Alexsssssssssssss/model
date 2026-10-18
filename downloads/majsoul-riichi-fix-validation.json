@@ -1,0 +1,17 @@
+{
+  "adapter_version": "20261019.2-riichi-candidates",
+  "riichi_regression_tests": 11,
+  "public_runtime": "riichienv==0.4.10",
+  "portable_archive_tests_passed": true,
+  "native_v5_inference": true,
+  "eight_round_transport_simulation_passed": true,
+  "terminal_win_draw_waits_for_server_result": true,
+  "network_regressions_passed": true,
+  "model_bytes_unchanged": true,
+  "real_account_full_game_tested": false,
+  "provided_replay_fetch": "timed_out",
+  "sha256": {
+    "ai-dispatch-console-v5-riichi-fix-20261019.zip": "fc558f34506a452f718ec7ae50205e88fefea902c42fbfe94f1684297720e10b",
+    "majsoul-riichi-hotfix-20261019.zip": "fc68d2fcc2a9d36e78ffe156fe189d73aa09a1697bea30fdab589a5b98629e56"
+  }
+}
