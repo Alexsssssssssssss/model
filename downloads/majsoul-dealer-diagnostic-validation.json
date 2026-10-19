@@ -1,0 +1,19 @@
+{
+  "adapter_version": "20261019.3-dealer-diagnostics",
+  "status": "diagnostic_only_first_turn_unresolved",
+  "regression_tests_passed": 13,
+  "public_runtime": "riichienv==0.4.10",
+  "eight_round_transport_simulation_passed": true,
+  "previous_replay_first_discard_inference_withdrawn": true,
+  "fields": [
+    "received_tiles",
+    "native_discard_tiles",
+    "model_decision",
+    "request",
+    "policy_seconds",
+    "rpc_method",
+    "discard_notification"
+  ],
+  "previous_riichi_fix_preserved": true,
+  "model_weights_changed": false
+}
