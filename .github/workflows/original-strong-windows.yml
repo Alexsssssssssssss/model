@@ -75,7 +75,7 @@ jobs:
           Expand-Archive build-input.zip -DestinationPath package
           curl.exe -L --fail -o original.rar https://github.com/Alexsssssssssssss/13/releases/download/1v/tenhoumianfei.rar
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          7z e original.rar -oextracted -y 'tenhoumianfei/utils/asmjit2.dll'
+          7z e original.rar -oextracted -r -y asmjit2.dll
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $weight=Get-ChildItem extracted -Recurse -Filter asmjit2.dll | Select-Object -First 1
           if (!$weight) { throw 'Original checkpoint not found' }
