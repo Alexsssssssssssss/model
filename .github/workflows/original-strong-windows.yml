@@ -90,11 +90,22 @@ jobs:
         run: |
           python check_original_ai.py
           python -u test_original_strong_dispatch.py
+      - name: Test the actual Windows startup batch
+        working-directory: package/ai-dispatch-console
+        shell: pwsh
+        run: |
+          python -m venv --system-site-packages .venv-original
+          $env:ORIGINAL_AI_NONINTERACTIVE = '1'
+          cmd.exe /c start-original-ai.cmd check
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          if ((Get-Content check-majsoul-network.cmd -Raw) -notmatch '\.venv-original') { throw 'Network check calls the wrong Python environment' }
       - name: Write tested release archive
         shell: python
         run: |
           import pathlib,zipfile,hashlib,json
           root=pathlib.Path('package/ai-dispatch-console')
+          import shutil
+          shutil.rmtree(root/'.venv-original',ignore_errors=True)
           checks=json.loads((root/'original-ai-check.json').read_text(encoding='utf-8'))
           assert checks['status']=='passed' and checks['platform']=='Windows'
           for p in root.rglob('__pycache__'):
@@ -105,6 +116,7 @@ jobs:
               for p in sorted(root.rglob('*')):
                   if p.is_file():
                       assert not p.name.endswith('.local.json')
+                      assert not any(part.startswith('.venv') for part in p.relative_to(root).parts)
                       z.write(p,'ai-dispatch-console/'+str(p.relative_to(root)))
           print('Release SHA256:',hashlib.sha256(out.read_bytes()).hexdigest())
       - name: Attach verified archive to draft release
