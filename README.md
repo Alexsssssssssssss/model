@@ -1,8 +1,14 @@
 # 麻将 AI 派遣
 
-最新完整包：**20261105.1 · 原版强 AI 直接派遣**。
+最新完整包：**20261105.3 · 庄家首打修复**。
 
-[下载 Windows 完整包](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/ai-dispatch-original-strong-20261105.zip) · [使用说明](downloads/ORIGINAL-STRONG-AI.md) · [发布页](https://github.com/Alexsssssssssssss/model/releases/tag/original-strong-20261105)
+[下载 Windows 完整包](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/ai-dispatch-original-strong-20261105-v3.zip) · [使用说明](downloads/ORIGINAL-STRONG-AI.md) · [发布页](https://github.com/Alexsssssssssssss/model/releases/tag/original-strong-20261105)
+
+[已安装原版包：下载庄家首打修复小补丁（约25 KB）](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/original-strong-dealer-first-hotfix-20261105.zip) · [补丁说明](downloads/ORIGINAL-STRONG-DEALER-FIRST-HOTFIX.md)
+
+20261105.3 修复可复现的庄家14张起手漏发请求分支：开局操作列表存在、但座位字段缺省/不一致时，旧程序会静默忽略，随后可能等到服务器超时自动摸切。现按本人的14张起手处理首打，保留特殊操作，普通后续操作继续按原座位校验。已通过 Windows 实际 protobuf 编解码、四座位、连庄、非庄家不越权出牌和完整对局回归。还包含提前加载/预热、只读权重复用、取消固定0.7秒等待和独立线程推理。
+
+关闭旧程序，将补丁内同名文件覆盖到原目录再启动；模型和账号配置不变。真实账号仍需本机复测；新的诊断记录开局操作座位、实际请求、耗时及弃牌回执，便于核实是否与复现分支一致。
 
 直接使用上传强 AI 的原始权重，不是 v5，也不是新训练模型；权重冻结，不在线更新。支持天凤四人赤牌半庄个室、雀魂国服标准四人赤牌半庄友人房。
 
