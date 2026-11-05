@@ -1,0 +1,126 @@
+name: Original strong AI Windows verification
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        type: choice
+        options: [runtime, package]
+        default: runtime
+      source_sha256:
+        type: string
+        default: ''
+permissions:
+  contents: write
+jobs:
+  native-runtime:
+    if: inputs.phase == 'runtime'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Equim-chan/Mortal
+          ref: 0cff2b52982be5b1163aa9a62fb01f03ce91e0d2
+          path: framework
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - uses: dtolnay/rust-toolchain@1.88.0
+      - run: python -m pip install numpy==1.26.4
+      - name: Build native public-event runtime
+        working-directory: framework
+        shell: pwsh
+        env:
+          CARGO_PROFILE_RELEASE_LTO: 'false'
+          CARGO_PROFILE_RELEASE_DEBUG: '0'
+          CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '16'
+        run: |
+          $env:PYO3_PYTHON = (Get-Command python).Source
+          cargo build --locked --release -p libriichi --lib --no-default-features --features pymod
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Copy-Item target/release/riichi.dll libriichi.pyd
+          python -c "import libriichi; from libriichi.consts import obs_shape; assert tuple(obs_shape(3))==(934,34); print('Native CPython 3.12 import passed')"
+      - name: Save verified native component
+        shell: python
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          import base64,json,os,pathlib,urllib.request,urllib.error
+          p=pathlib.Path('framework/libriichi.pyd')
+          url='https://api.github.com/repos/'+os.environ['REPO']+'/contents/downloads/native/libriichi-cp312-win_amd64.pyd'
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
+          body={'message':'Build CPython 3.12 Windows runtime from pinned public source','content':base64.b64encode(p.read_bytes()).decode(),'branch':'main'}
+          try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers=headers)) as r: body['sha']=json.load(r)['sha']
+          except urllib.error.HTTPError as e:
+              if e.code!=404: raise
+          with urllib.request.urlopen(urllib.request.Request(url,data=json.dumps(body).encode(),headers={**headers,'Content-Type':'application/json'},method='PUT')) as r: print('Saved native component:',json.load(r)['commit']['sha'])
+  package-verification:
+    if: inputs.phase == 'package'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - name: Download reviewed build input and original weight archive
+        shell: pwsh
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha256 }}
+        run: |
+          curl.exe -L --fail -o build-input.zip https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/original-strong-build-input-20261105.zip
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          if ((Get-FileHash build-input.zip -Algorithm SHA256).Hash.ToLower() -ne $env:SOURCE_SHA) { throw 'Build input identity changed' }
+          Expand-Archive build-input.zip -DestinationPath package
+          curl.exe -L --fail -o original.rar https://github.com/Alexsssssssssssss/13/releases/download/1v/tenhoumianfei.rar
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          7z e original.rar -oextracted -y 'tenhoumianfei/utils/asmjit2.dll'
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $weight=Get-ChildItem extracted -Recurse -Filter asmjit2.dll | Select-Object -First 1
+          if (!$weight) { throw 'Original checkpoint not found' }
+          if ((Get-FileHash $weight.FullName -Algorithm SHA256).Hash.ToLower() -ne '55e78deeca0a020a9b99578e936a27cafdacaa62072259e354571554a93322c9') { throw 'Original weight identity differs' }
+          Copy-Item $weight.FullName package/ai-dispatch-console/models/original-strong.pt
+      - name: Install tested CPU dependencies
+        run: |
+          python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r package/ai-dispatch-console/requirements-original-ai.txt
+      - name: Real Windows import, native inference and regressions
+        working-directory: package/ai-dispatch-console
+        run: |
+          python check_original_ai.py
+          python -u test_original_strong_dispatch.py
+      - name: Write tested release archive
+        shell: python
+        run: |
+          import pathlib,zipfile,hashlib,json
+          root=pathlib.Path('package/ai-dispatch-console')
+          checks=json.loads((root/'original-ai-check.json').read_text(encoding='utf-8'))
+          assert checks['status']=='passed' and checks['platform']=='Windows'
+          for p in root.rglob('__pycache__'):
+              import shutil
+              shutil.rmtree(p)
+          out=pathlib.Path('ai-dispatch-original-strong-20261105.zip')
+          with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED) as z:
+              for p in sorted(root.rglob('*')):
+                  if p.is_file():
+                      assert not p.name.endswith('.local.json')
+                      z.write(p,'ai-dispatch-console/'+str(p.relative_to(root)))
+          print('Release SHA256:',hashlib.sha256(out.read_bytes()).hexdigest())
+      - name: Attach verified archive to draft release
+        shell: python
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          import json,os,pathlib,urllib.request,urllib.parse
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
+          base='https://api.github.com/repos/'+os.environ['REPO']
+          with urllib.request.urlopen(urllib.request.Request(base+'/releases',headers=headers)) as r:
+              release=next(x for x in json.load(r) if x['tag_name']=='original-strong-20261105')
+          p=pathlib.Path('ai-dispatch-original-strong-20261105.zip')
+          for asset in release['assets']:
+              if asset['name']==p.name:
+                  urllib.request.urlopen(urllib.request.Request(base+'/releases/assets/'+str(asset['id']),headers=headers,method='DELETE')).close()
+          url='https://uploads.github.com/repos/'+os.environ['REPO']+'/releases/'+str(release['id'])+'/assets?name='+urllib.parse.quote(p.name)
+          with urllib.request.urlopen(urllib.request.Request(url,data=p.read_bytes(),headers={**headers,'Content-Type':'application/zip'},method='POST')) as r: print('Uploaded tested package:',json.load(r)['name'])
