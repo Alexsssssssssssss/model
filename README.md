@@ -1,3 +1,23 @@
+# 麻将 AI 派遣
+
+最新完整包：**20261105.1 · 原版强 AI 直接派遣**。
+
+[下载 Windows 完整包](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/ai-dispatch-original-strong-20261105.zip) · [使用说明](downloads/ORIGINAL-STRONG-AI.md) · [发布页](https://github.com/Alexsssssssssssss/model/releases/tag/original-strong-20261105)
+
+直接使用上传强 AI 的原始权重，不是 v5，也不是新训练模型；权重冻结，不在线更新。支持天凤四人赤牌半庄个室、雀魂国服标准四人赤牌半庄友人房。
+
+已有 64 位 Python 3.12 可以复用，Windows 原生组件已重新编译。关闭旧程序，完整解压到短路径（例如 `C:\mahjong-ai`），双击 **start-original-ai.cmd**。管理员在 `http://127.0.0.1:8780/admin` 配置账号，用户凭邀请口令在首页选择房间与“原版强 AI · 上传原权重”派遣。
+
+旧账号与邀请口令配置可以保留或复制到新目录；新依赖安装到 `.venv-original`。包内不含账号、密码或邀请口令。每位 AI 必须使用不同账号。
+
+Windows 上已验证原生加载、原权重推理、合法动作/赤五立直/首打/换局回归和整场动作核对；真实账号登录、入房及完整平台对局仍需本机验证。新包不包含云服务器，AI 使用运行该程序的机器的网络。
+
+[Windows 构建与验证](https://github.com/Alexsssssssssssss/model/actions/workflows/original-strong-windows.yml)。原权重 SHA-256：`55e78deeca0a020a9b99578e936a27cafdacaa62072259e354571554a93322c9`。
+
+---
+
+## 历史版本说明（以下下载与模型信息不代表最新包）
+
 ## 2026-10-19 雀魂立直与首打修复
 
 [已安装用户下载小补丁](downloads/majsoul-riichi-hotfix-20261019.zip) · [下载完整 v5 程序包](downloads/ai-dispatch-console-v5-riichi-fix-20261019.zip)
