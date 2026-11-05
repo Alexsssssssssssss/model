@@ -1,22 +1,24 @@
 # 麻将 AI 派遣
 
-最新完整包：**20261105.4 · 雀魂暗杠/加杠通知修复**。
+最新程序：**20261105.5 · 首打时序与终局接收补丁**。
 
-[下载 Windows 完整包](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/ai-dispatch-original-strong-20261105-v4.zip) · [使用说明](downloads/ORIGINAL-STRONG-AI.md) · [发布页](https://github.com/Alexsssssssssssss/model/releases/tag/original-strong-20261105)
+[下载 Windows 完整包](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/ai-dispatch-original-strong-20261105-opening.zip) · [使用说明](downloads/ORIGINAL-STRONG-AI.md) · [发布页](https://github.com/Alexsssssssssssss/model/releases/tag/original-strong-20261105)
 
-[已安装原版包：下载杠通知修复小补丁](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/original-strong-kan-hotfix-20261105.zip) · [覆盖说明](downloads/ORIGINAL-STRONG-KAN-HOTFIX.md)
+[已安装原版包：下载覆盖补丁](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/original-strong-opening-hotfix-20261105.zip) · [补丁说明](downloads/ORIGINAL-STRONG-OPENING-HOTFIX.md)
 
-旧程序误将雀魂暗杠通知 `type=3` 当加杠、加杠通知 `type=2` 当暗杠。其他 AI 收到暗杠时会查找不存在的碰牌，报「找不到加杠前的公开碰牌」。现按通知类型分别处理，保留万筒索赤五身份，加杠只查本局碰牌。Windows 回归覆盖所有座位、其他玩家视角、杠后摸打、多个邀请 AI 同时收到暗杠和原有立直/终局处理。抢杠结果测试仅验证路由及放铳者归属。
+实际诊断中的首打计算只有 31–47 毫秒，4 次首打中有 3 次服务器弃牌与请求不同，不能再将接口应答当作弃牌执行成功。此次依据公开直连实现的开局时间窗口，先计算、再等待至收到新局通知后 3.1 秒发送。普通摸打与副露不增加该等待；排队已超过开局窗口时不重复等待。庄家 14 张按配牌处理，首打和首巡立直请求不使用引擎合成摸牌位的摸切标记。
 
-**庄家首打长考仍未确认解决**；此次不将已修正的杠通知错误与首打问题混为一谈。保留前一版的提前加载、模型复用、独立线程推理和分段耗时诊断，实际首打仍需要本机任务诊断确认。
+终局后换局确认返回 1204 时，继续接收整场结果或下一局通知，最多等待 30 秒；没有后续通知仍报原错误。只在收到整场结果后完成任务。包含上一版暗杠/加杠通知编号修正。新增网络收包、排队和换局请求时间线，不记录密码、token 或登录请求。
 
-关闭旧控制台，将补丁内 `ai-dispatch-console` 文件夹中的文件覆盖到原程序目录，再运行 `start-original-ai.cmd`。账号、邀请口令和模型权重不变。新任务诊断的 `adapter_version` 为 `20261105.4-kan-notification`。
+Windows 上验证了原始模型、4 副匿名诊断起手牌、模拟开局窗口、实际请求/弃牌一致性、普通摸打无额外等待，以及 1204 与整场结果同时到达等回归。**仍需在你的实际平台对局复测，模拟窗口测试不等于实战已确认解决。**
 
-直接使用上传强 AI 的原始权重，不是 v5 或新训练模型；权重冻结，不在线更新。支持天凤四人三赤半庄个室、雀魂国服标准四人三赤半庄友人房。每位 AI 使用不同账号。
+关闭旧控制台，将补丁内 `ai-dispatch-console` 文件夹中的全部文件覆盖到原程序目录，再运行 `start-original-ai.cmd`。必须一起覆盖 `majsoul_protocol.py`。账号配置与权重不变。新诊断版本应为 `20261105.5-opening-window`。
 
-已有 64 位 Python 3.12 可以复用。新安装请把完整包解压到短路径（例如 `C:\mahjong-ai`），双击 `start-original-ai.cmd`。管理员在 `http://127.0.0.1:8780/admin` 配置账号，用户凭邀请口令在首页选择房间与“原版强 AI · 上传原权重”。包内没有账号、密码或邀请口令。
+模型仍是上传的原版强 AI，原始权重冻结，不是新训练模型。支持天凤四人三赤半庄个室、雀魂国服标准四人三赤半庄友人房。每位 AI 使用不同账号。
 
-[Windows 构建与验证](https://github.com/Alexsssssssssssss/model/actions/runs/42046953242)。测试使用真实原生组件和权重，网络传输由本地替代，未登录真实平台账号。原权重 SHA-256：`55e78deeca0a020a9b99578e936a27cafdacaa62072259e354571554a93322c9`。
+新安装需要 64 位 Python 3.12，完整解压到短路径（例如 `C:\mahjong-ai`）后启动。管理员在 `http://127.0.0.1:8780/admin` 配置账号，用户凭邀请口令在首页派遣。包内没有账号、密码或邀请口令。
+
+[Windows 验证记录](https://github.com/Alexsssssssssssss/model/actions/runs/42051159566)。原权重 SHA-256：`55e78deeca0a020a9b99578e936a27cafdacaa62072259e354571554a93322c9`。
 
 ---
 
