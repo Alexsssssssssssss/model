@@ -1,24 +1,24 @@
 # 麻将 AI 派遣
 
-最新程序：**20261105.5 · 首打时序与终局接收补丁**。
+最新程序：**20261105.6 · 雀魂独立重连与原局恢复**。
 
-[下载 Windows 完整包](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/ai-dispatch-original-strong-20261105-opening.zip) · [使用说明](downloads/ORIGINAL-STRONG-AI.md) · [发布页](https://github.com/Alexsssssssssssss/model/releases/tag/original-strong-20261105)
+[下载 Windows 完整包](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/ai-dispatch-original-strong-20261105-reconnect.zip) · [使用说明](downloads/ORIGINAL-STRONG-AI.md) · [发布页](https://github.com/Alexsssssssssssss/model/releases/tag/original-strong-20261105)
 
-[已安装原版包：下载覆盖补丁](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/original-strong-opening-hotfix-20261105.zip) · [补丁说明](downloads/ORIGINAL-STRONG-OPENING-HOTFIX.md)
+[已安装原版包：下载覆盖补丁](https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/original-strong-reconnect-hotfix-20261105.zip) · [重连说明](downloads/ORIGINAL-STRONG-RECONNECT-HOTFIX.md)
 
-实际诊断中的首打计算只有 31–47 毫秒，4 次首打中有 3 次服务器弃牌与请求不同，不能再将接口应答当作弃牌执行成功。此次依据公开直连实现的开局时间窗口，先计算、再等待至收到新局通知后 3.1 秒发送。普通摸打与副露不增加该等待；排队已超过开局窗口时不重复等待。庄家 14 张按配牌处理，首打和首巡立直请求不使用引擎合成摸牌位的摸切标记。
+雀魂对局遇到网络中断后，各 AI 独立尝试恢复同一对局，最多 6 次、每轮总预算 120 秒，页面显示重连和恢复状态。重新鉴权后读取服务器完整牌局记录重建手牌、副露、杠和立直。历史动作只重放状态，不发送操作。请求已接受但回执丢失时不会盲目重发；同步完成后仅按最新服务器许可重新决策。
 
-终局后换局确认返回 1204 时，继续接收整场结果或下一局通知，最多等待 30 秒；没有后续通知仍报原错误。只在收到整场结果后完成任务。包含上一版暗杠/加杠通知编号修正。新增网络收包、排队和换局请求时间线，不记录密码、token 或登录请求。
+重复通知忽略，步骤缺口重新同步，缺少完整恢复记录时暂不出牌。断网期间跨局时保留部分日志、标记统计覆盖不完整，不虚构缺失结果；半庄只有在实际收到服务器整场结果后才完成。网络恢复功能适用于程序持续运行的同一雀魂任务，未增加天凤重连或关闭程序后的任务接续。
 
-Windows 上验证了原始模型、4 副匿名诊断起手牌、模拟开局窗口、实际请求/弃牌一致性、普通摸打无额外等待，以及 1204 与整场结果同时到达等回归。**仍需在你的实际平台对局复测，模拟窗口测试不等于实战已确认解决。**
+包含此前的首打发送时序、配牌摸切标记、终局 1204 接收、赤五立直和暗杠/加杠通知修正。原始模型权重不变，不在线训练。
 
-关闭旧控制台，将补丁内 `ai-dispatch-console` 文件夹中的全部文件覆盖到原程序目录，再运行 `start-original-ai.cmd`。必须一起覆盖 `majsoul_protocol.py`。账号配置与权重不变。新诊断版本应为 `20261105.5-opening-window`。
+关闭旧控制台，将补丁内 `ai-dispatch-console` 文件夹中的全部文件覆盖到原程序目录，再运行 `start-original-ai.cmd`。必须包括新增的 `majsoul_recovery.py` 以及 `majsoul_live.py`、`majsoul_protocol.py`。账号配置、邀请口令和权重不变，新诊断版本为 `20261105.6-reconnect`。
 
-模型仍是上传的原版强 AI，原始权重冻结，不是新训练模型。支持天凤四人三赤半庄个室、雀魂国服标准四人三赤半庄友人房。每位 AI 使用不同账号。
+Windows 56 项回归通过，覆盖实际 worker 的 ACK 丢失、重新鉴权、恢复、终局完成路径，以及三个客户端独立重试、赤五暗杠/立直恢复等。**使用故障注入与模拟传输，实际平台网络切换仍需本机复测。** 网络断开期间服务器仍可能超时自动出牌；要脱离本机网络，需要把程序部署到稳定的云服务器，此补丁不购买或部署云服务。
 
-新安装需要 64 位 Python 3.12，完整解压到短路径（例如 `C:\mahjong-ai`）后启动。管理员在 `http://127.0.0.1:8780/admin` 配置账号，用户凭邀请口令在首页派遣。包内没有账号、密码或邀请口令。
+新安装需要 64 位 Python 3.12，完整解压到短路径（例如 `C:\mahjong-ai`）后启动。管理员在 `http://127.0.0.1:8780/admin` 配置账号，用户凭邀请口令在首页派遣。支持天凤四人三赤半庄个室、雀魂国服标准四人三赤半庄友人房。每位 AI 使用不同账号，包内不含账号密码。
 
-[Windows 验证记录](https://github.com/Alexsssssssssssss/model/actions/runs/42051159566)。原权重 SHA-256：`55e78deeca0a020a9b99578e936a27cafdacaa62072259e354571554a93322c9`。
+[Windows 验证记录](https://github.com/Alexsssssssssssss/model/actions/runs/42057931366)。原权重 SHA-256：`55e78deeca0a020a9b99578e936a27cafdacaa62072259e354571554a93322c9`。
 
 ---
 
