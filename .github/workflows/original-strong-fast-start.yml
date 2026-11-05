@@ -1,0 +1,108 @@
+name: Original strong AI startup latency fix
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha256:
+        type: string
+        required: true
+permissions:
+  contents: write
+jobs:
+  package-verification:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - name: Download reviewed build input and original weight archive
+        shell: pwsh
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha256 }}
+        run: |
+          curl.exe -L --fail -o build-input.zip https://raw.githubusercontent.com/Alexsssssssssssss/model/main/downloads/original-strong-build-input-20261105.zip
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          if ((Get-FileHash build-input.zip -Algorithm SHA256).Hash.ToLower() -ne $env:SOURCE_SHA) { throw 'Build input identity changed' }
+          Expand-Archive build-input.zip -DestinationPath package
+          curl.exe -L --fail -o original.rar https://github.com/Alexsssssssssssss/13/releases/download/1v/tenhoumianfei.rar
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          7z e original.rar -oextracted -r -y asmjit2.dll
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $weight=Get-ChildItem extracted -Recurse -Filter asmjit2.dll | Select-Object -First 1
+          if (!$weight) { throw 'Original checkpoint not found' }
+          if ((Get-FileHash $weight.FullName -Algorithm SHA256).Hash.ToLower() -ne '55e78deeca0a020a9b99578e936a27cafdacaa62072259e354571554a93322c9') { throw 'Original weight identity differs' }
+          Copy-Item $weight.FullName package/ai-dispatch-console/models/original-strong.pt
+      - name: Install tested CPU dependencies
+        run: |
+          python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r package/ai-dispatch-console/requirements-original-ai.txt
+      - name: Real Windows import, native inference and regressions
+        working-directory: package/ai-dispatch-console
+        run: |
+          python check_original_ai.py
+          python -u test_original_strong_dispatch.py
+          python -m unittest test_original_strong_latency -v
+      - name: Compare actual worker latency against the previous package
+        working-directory: package/ai-dispatch-console
+        shell: pwsh
+        run: |
+          curl.exe -L --fail -o "$env:RUNNER_TEMP/old-original.zip" https://github.com/Alexsssssssssssss/model/releases/download/original-strong-20261105/ai-dispatch-original-strong-20261105.zip
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Expand-Archive "$env:RUNNER_TEMP/old-original.zip" -DestinationPath "$env:RUNNER_TEMP/old-original"
+          python profile_original_ai_latency.py --project "$env:RUNNER_TEMP/old-original/ai-dispatch-console" --old --output old-worker-latency.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python profile_original_ai_latency.py --output original-ai-latency-check.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -c "import json;from pathlib import Path;b=json.loads(Path('old-worker-latency.json').read_text());a=json.loads(Path('original-ai-latency-check.json').read_text());assert b['checkpoint_sha256']==a['checkpoint_sha256'];assert b['requests']==a['requests'];assert a['request_seconds'][0]<b['request_seconds'][0];r=dict(status='passed',old_first_request_seconds=b['request_seconds'][0],new_first_request_seconds=a['request_seconds'][0],old_following_request_seconds=b['request_seconds'][1:],new_following_request_seconds=a['request_seconds'][1:],requests_unchanged=True,original_weights_unchanged=True,transport='synthetic-no-account-no-real-network');Path('original-ai-speed-comparison.json').write_text(json.dumps(r,indent=2));print(json.dumps(r))"
+      - name: Test the actual Windows startup batch
+        working-directory: package/ai-dispatch-console
+        shell: pwsh
+        run: |
+          python -m venv --system-site-packages .venv-original
+          $env:ORIGINAL_AI_NONINTERACTIVE = '1'
+          cmd.exe /c start-original-ai.cmd check
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          if ((Get-Content check-majsoul-network.cmd -Raw) -notmatch '\.venv-original') { throw 'Network check calls the wrong Python environment' }
+      - name: Write tested release archive
+        shell: python
+        run: |
+          import pathlib,zipfile,hashlib,json
+          root=pathlib.Path('package/ai-dispatch-console')
+          import shutil
+          shutil.rmtree(root/'.venv-original',ignore_errors=True)
+          checks=json.loads((root/'original-ai-check.json').read_text(encoding='utf-8'))
+          assert checks['status']=='passed' and checks['platform']=='Windows'
+          for p in root.rglob('__pycache__'):
+              import shutil
+              shutil.rmtree(p)
+          out=pathlib.Path('ai-dispatch-original-strong-20261105-v2.zip')
+          with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED) as z:
+              for p in sorted(root.rglob('*')):
+                  if p.is_file():
+                      assert not p.name.endswith('.local.json')
+                      assert not any(part.startswith('.venv') for part in p.relative_to(root).parts)
+                      z.write(p,'ai-dispatch-console/'+str(p.relative_to(root)))
+          print('Release SHA256:',hashlib.sha256(out.read_bytes()).hexdigest())
+          small=pathlib.Path('original-strong-speed-hotfix-20261105.zip')
+          files=['original_strong_live.py','majsoul_live.py','start-original-ai.cmd','public-web/app.js','dispatch-web/app.js','HOTFIX-SPEED.md','original-ai-speed-comparison.json']
+          with zipfile.ZipFile(small,'w',zipfile.ZIP_DEFLATED) as z:
+              for name in files: z.write(root/name,'ai-dispatch-console/'+name)
+          print('Hotfix SHA256:',hashlib.sha256(small.read_bytes()).hexdigest())
+      - name: Attach verified archive to draft release
+        shell: python
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          import json,os,pathlib,urllib.request,urllib.parse
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
+          base='https://api.github.com/repos/'+os.environ['REPO']
+          with urllib.request.urlopen(urllib.request.Request(base+'/releases',headers=headers)) as r:
+              release=next(x for x in json.load(r) if x['tag_name']=='original-strong-20261105')
+          for name in ['ai-dispatch-original-strong-20261105-v2.zip','original-strong-speed-hotfix-20261105.zip']:
+              p=pathlib.Path(name)
+              for asset in release['assets']:
+                  if asset['name']==p.name:
+                      urllib.request.urlopen(urllib.request.Request(base+'/releases/assets/'+str(asset['id']),headers=headers,method='DELETE')).close()
+              url='https://uploads.github.com/repos/'+os.environ['REPO']+'/releases/'+str(release['id'])+'/assets?name='+urllib.parse.quote(p.name)
+              with urllib.request.urlopen(urllib.request.Request(url,data=p.read_bytes(),headers={**headers,'Content-Type':'application/zip'},method='POST')) as r: print('Uploaded tested package:',json.load(r)['name'])
